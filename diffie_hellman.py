@@ -1,4 +1,4 @@
-from math import gcd, pow
+from math import gcd
 import random
 
 class Endpoint:
@@ -29,7 +29,7 @@ class Endpoint:
     if self.pr < 1 or self.pr >= self.q:
       raise Exception(f'Something went wrong when generating the private key: {self.pr}')
 
-    self.pu = pow(self.alpha, self.pr) % self.q
+    self.pu = int(pow(self.alpha, self.pr, self.q))
 
   def set_other_pu(self, other_pu):
     if other_pu < 1 or other_pu >= self.q:
@@ -42,5 +42,5 @@ class Endpoint:
       print('Could not generate secret without an outsider\'s public key')
       raise Exception()
 
-    self.secret = pow(self.other_pu, self.pr) % self.q
+    self.secret = int(pow(self.other_pu, self.pr, self.q))
     return self.secret
