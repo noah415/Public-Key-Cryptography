@@ -9,8 +9,11 @@ class Endpoint:
   ):
     self.q = q
     self.alpha = alpha
+    # Private Key
     self.pr = 0
+    # Public Key
     self.pu = 0
+    # Other Person's Public Key
     self.other_pu = 0
     self.secret = 0
 
@@ -32,7 +35,7 @@ class Endpoint:
     self.pu = int(pow(self.alpha, self.pr, self.q))
 
   def set_other_pu(self, other_pu):
-    if other_pu < 1 or other_pu >= self.q:
+    if other_pu < 1 or other_pu > self.q:
       raise Exception(f'Invalid other public key: {other_pu}')
 
     self.other_pu = other_pu
