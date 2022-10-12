@@ -47,35 +47,35 @@ def setup_alice_and_bob():
     return None, None
 
 
-def from_alice_to_bob(key, alice):
+def from_alice_to_bob(key, alice, bob):
   msg = input(f'\n\nInput Message Here: ')
   cbc = CBC(str(key))
 
   ct = cbc.encrypt(msg)
   print(f'\n\nAlice\'s encrypted message is: {ct}')
 
-  ct = checkForTampering(alice, ct)
+  ct = checkForTampering(alice, bob, ct)
 
   pt = cbc.decrypt(ct)
   print(f'\n\nAfter recieving the encrypted message, Bob decrypts it to be: \'{pt}\'\n\n')
 
-def from_bob_to_alice(key, bob):
+def from_bob_to_alice(key, bob, alice):
   msg = input(f'\n\nInput Message Here: ')
   cbc = CBC(str(key))
 
   ct = cbc.encrypt(msg)
   print(f'\n\nBob\'s encrypted message is: {ct}')
 
-  ct = checkForTampering(bob, ct)
+  ct = checkForTampering(bob, alice, ct)
 
   pt = cbc.decrypt(ct)
   print(f'\n\nAfter recieving the encrypted message, Alice decrypts it to be: \'{pt}\'\n\n')
 
 
-def malloryAlpha(ct, sender):
+def malloryAlpha(ct, sender, receiver):
   print(f'\n\nSince Mallory has tampered with the alpha value or changed the public key, she can now read and write whatever she wants.')
   mallory = Endpoint(sender.q, sender.alpha)
-  mallory.set_other_pu(sender.pu)
+  mallory.set_other_pu(receiver.pu)
   mallory.generate_secret()
   print(f'Mallory\'s generated secret: {mallory.secret}')
 
@@ -102,12 +102,12 @@ def malloryPublicKey(ct):
   return cbc.encrypt('Mallory was here')
 
 
-def checkForTampering(sender, ct) -> str:
+def checkForTampering(sender, reciever, ct) -> str:
   '''
   Returns the new ciphered text
   '''
   if sender.alpha == 1 or sender.alpha == sender.q or sender.alpha == sender.q-1:
-    return malloryAlpha(ct, sender.alpha)
+    return malloryAlpha(ct, sender, reciever)
   elif sender.other_pu == sender.q:
     return malloryPublicKey(ct)
   return ct
@@ -126,6 +126,10 @@ def tamperPublicKeys(alice, bob):
 def tamperAlphaTo1(alice, bob):
   alice.alpha = 1
   bob.alpha = 1
+  alice.initialize_keys()
+  bob.initialize_keys()
+  alice.set_other_pu(bob.pu)
+  bob.set_other_pu(alice.pu)
 
   alice.generate_secret()
   bob.generate_secret()
@@ -135,6 +139,10 @@ def tamperAlphaTo1(alice, bob):
 def tamperAlphaToq(alice, bob):
   alice.alpha = alice.q
   bob.alpha = bob.q
+  alice.initialize_keys()
+  bob.initialize_keys()
+  alice.set_other_pu(bob.pu)
+  bob.set_other_pu(alice.pu)
 
   alice.generate_secret()
   bob.generate_secret()
@@ -145,6 +153,10 @@ def tamperAlphaToq(alice, bob):
 def tamperAlphaTo1LessThanq(alice, bob):
   alice.alpha = alice.q - 1
   bob.alpha = bob.q - 1
+  alice.initialize_keys()
+  bob.initialize_keys()
+  alice.set_other_pu(bob.pu)
+  bob.set_other_pu(alice.pu)
 
   alice.generate_secret()
   bob.generate_secret()
@@ -185,9 +197,9 @@ def main():
     cmd = input(prompt)
 
     if cmd == '1':
-      from_alice_to_bob(alice.secret, alice) 
+      from_alice_to_bob(alice.secret, alice, bob) 
     elif cmd == '2':
-      from_bob_to_alice(bob.secret, bob)
+      from_bob_to_alice(bob.secret, bob, alice)
     elif cmd == '3':
       tamper(alice, bob)
     elif cmd == '4':
