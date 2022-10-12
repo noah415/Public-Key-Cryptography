@@ -30,24 +30,25 @@ class RSA:
         
     def _decrypt_message(self, message: int):
 
-        print('Decrypting')
-        int_str = (message ** self._d) % self.n
+        # print('Decrypting')
+        # int_str = (message ** self._d) % self.n
 
-        # print(f'Starting decryption (this may take a while)...')
-        # m_1 = pow(message, self._dp) % self._p
-        # print(f'Calculated m_1...')
-        # m_2 = pow(message, self._dq) % self._q
-        # print(f'Calculated m_2...')
-        # h = (self._q_inv * (m_1 - m_2)) % self._p
-        # print(f'Calculated h...')
+        print(f'Starting decryption (this may take a while)...')
+        m_1 = pow(message, self._dp) % self._p
+        print(f'Calculated m_1...')
+        m_2 = pow(message, self._dq) % self._q
+        print(f'Calculated m_2...')
+        h = (self._q_inv * (m_1 - m_2)) % self._p
+        print(f'Calculated h...')
 
-        # int_str = m_2 + h * self._q
-        # print(f'Calculated message...')
+        int_str = m_2 + h * self._q
+        print(f'Calculated message...')
 
         return self._int_to_text(int_str)
 
     def _text_to_int(self, text):
         hex_str = text.encode('utf-8').hex()
+        print(hex_str)
         int_text = int(hex_str, 16)
         return int_text
 
@@ -57,7 +58,6 @@ class RSA:
         if hex_num[0:2] == '0x':
             hex_num = hex_num[2:]
 
-        print(hex_num)
         return bytes.fromhex(hex_num).decode('utf-8')
 
 
@@ -177,8 +177,10 @@ THE CODE BELOW IS FOR GENERATION OF LARGE PRIMES AND TAKES FOREVER TO RUN. DO NO
      
     #     return [i for i, p in enumerate(prime) if p][2:]
 
-rsa = RSA(32)
+rsa = RSA(16)
 
-message = rsa.public_key()("I Like Lasagna")
-print(f'Encrypted message: {message}')
+message = rsa.public_key()("A")
+message2 = rsa.public_key()("64")
+print(f'Encrypted messages: {message}, {message2}')
 print(rsa.private_key()(message))
+print(rsa.private_key()(message2))
